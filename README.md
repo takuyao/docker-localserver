@@ -12,3 +12,4 @@
 
 1. Change `MYSQL_ROOT_PASSWORD` in `docker-compose.yml`.
 1. Execute `docker-compose up -d`.
+1. Open `http://<YOUR IP ADDRESS>/index.html`.
