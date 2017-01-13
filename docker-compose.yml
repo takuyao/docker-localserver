@@ -1,0 +1,66 @@
+version: "2.0"
+services:
+    data_gitbucket:
+        image: busybox
+        volumes:
+            - ./gitbucket:/gitbucket
+    data_db:
+        image: busybox
+        volumes:
+            - ./db:/var/lib/mysql
+    data_redmine:
+        image: busybox
+        volumes:
+            - ./redmine:/home/redmine/data
+    data_jenkins:
+        image: busybox
+        volumes:
+            - ./jenkins:/var/jenkins_home
+
+    proxy:
+        build: proxy
+        links:
+            - gitbucket:gitbucket
+            - redmine:redmine
+            - jenkins:jenkins
+        ports:
+            - "80:80"
+
+    db:
+        image: mariadb
+        volumes_from:
+            - data_db
+        environment:
+            MYSQL_ROOT_PASSWORD: <MYSQL_ROOT_PASSWORD>
+        ports:
+            - "3306:3306"
+    gitbucket:
+        image: f99aq8ove/gitbucket
+        volumes_from:
+            - data_gitbucket
+        command: java -jar /opt/gitbucket.war --prefix=/gitbucket
+        ports:
+            - "29418:29418"
+        # Initial password is root/root
+    redmine:
+        image: sameersbn/redmine
+        volumes_from:
+            - data_redmine
+            - data_gitbucket
+        environment:
+            REDMINE_HTTPS: "false"
+            REDMINE_RELATIVE_URL_ROOT: /redmine
+            DB_ADAPTER: mysql2
+            DB_HOST: db
+            DB_USER: root
+            DB_NAME: redmine
+            DB_PASS: <MYSQL_ROOT_PASSWORD>
+        # Initial password is admin/admin
+    jenkins:
+        image: jenkins:alpine
+        volumes_from:
+            - data_jenkins
+        ports:
+            - "50000:50000"
+        environment:
+            JENKINS_OPTS: "--prefix=/jenkins"
