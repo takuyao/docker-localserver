@@ -1,0 +1,13 @@
+.DS_Store
+
+db/*
+!db/.gitkeep
+
+gitbucket/*
+!gitbucket/.gitkeep
+
+jenkins/*
+!jenkins/.gitkeep
+
+redmine/*
+!redmine/.gitkeep
